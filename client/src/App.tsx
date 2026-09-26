@@ -13,6 +13,7 @@ import { DeliveriesPage } from './pages/DeliveriesPage';
 import { ReceiptDetailPage } from './pages/operations/ReceiptDetailPage';
 import { DeliveryDetailPage } from './pages/operations/DeliveryDetailPage';
 import { TransferDetailPage } from './pages/operations/TransferDetailPage';
+import { AdjustmentDetailPage } from './pages/operations/AdjustmentDetailPage';
 import { TransfersPage } from './pages/TransfersPage';
 import { AdjustmentsPage } from './pages/AdjustmentsPage';
 import { MoveHistoryPage } from './pages/MoveHistoryPage';
@@ -58,6 +59,8 @@ export function App() {
                 <Route path="operations/transfers/new" element={<TransferDetailPage />} />
                 <Route path="operations/transfers/:id" element={<TransferDetailPage />} />
                 <Route path="operations/adjustments" element={<AdjustmentsPage />} />
+                <Route path="operations/adjustments/new" element={<AdjustmentDetailPage />} />
+                <Route path="operations/adjustments/:id" element={<AdjustmentDetailPage />} />
                 <Route path="move-history" element={<MoveHistoryPage />} />
                 <Route path="settings" element={<Navigate to="/settings/warehouses" replace />} />
                 <Route path="settings/warehouses" element={<WarehousesPage />} />
