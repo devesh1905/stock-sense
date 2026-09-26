@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+coverage
+*.svg
+*.excalidraw
+server/prisma/migrations
+package-lock.json
