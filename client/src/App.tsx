@@ -10,6 +10,8 @@ import { DashboardPage } from './pages/DashboardPage';
 import { StockPage } from './pages/StockPage';
 import { ReceiptsPage } from './pages/ReceiptsPage';
 import { DeliveriesPage } from './pages/DeliveriesPage';
+import { ReceiptDetailPage } from './pages/operations/ReceiptDetailPage';
+import { DeliveryDetailPage } from './pages/operations/DeliveryDetailPage';
 import { TransfersPage } from './pages/TransfersPage';
 import { AdjustmentsPage } from './pages/AdjustmentsPage';
 import { MoveHistoryPage } from './pages/MoveHistoryPage';
@@ -46,7 +48,11 @@ export function App() {
                 <Route path="stock" element={<StockPage />} />
                 <Route path="operations" element={<Navigate to="/operations/receipts" replace />} />
                 <Route path="operations/receipts" element={<ReceiptsPage />} />
+                <Route path="operations/receipts/new" element={<ReceiptDetailPage />} />
+                <Route path="operations/receipts/:id" element={<ReceiptDetailPage />} />
                 <Route path="operations/deliveries" element={<DeliveriesPage />} />
+                <Route path="operations/deliveries/new" element={<DeliveryDetailPage />} />
+                <Route path="operations/deliveries/:id" element={<DeliveryDetailPage />} />
                 <Route path="operations/transfers" element={<TransfersPage />} />
                 <Route path="operations/adjustments" element={<AdjustmentsPage />} />
                 <Route path="move-history" element={<MoveHistoryPage />} />
