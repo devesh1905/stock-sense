@@ -24,3 +24,14 @@ export const ensureVirtualLocations = async () => {
     }
   }
 };
+
+export const getVirtualLocation = async (type: 'VENDOR' | 'CUSTOMER' | 'ADJUSTMENT') => {
+  await ensureVirtualLocations();
+  const loc = await prisma.location.findFirst({
+    where: { type, warehouseId: null }
+  });
+  if (!loc) {
+    throw new Error(`Virtual location of type ${type} could not be retrieved.`);
+  }
+  return loc;
+};
