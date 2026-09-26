@@ -1,7 +1,11 @@
 import React from 'react';
-import { User, Shield, Mail, Key } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { User as UserIcon, Shield, Mail, Key } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const ProfilePage: React.FC = () => {
+  const { user } = useAuth();
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
@@ -11,16 +15,16 @@ export const ProfilePage: React.FC = () => {
 
       <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-6 space-y-6">
         <div className="flex items-center gap-4 pb-6 border-b border-slate-100">
-          <div className="w-16 h-16 rounded-full bg-slate-800 text-white font-bold text-2xl flex items-center justify-center">
-            A
+          <div className="w-16 h-16 rounded-full bg-slate-800 text-white font-bold text-2xl flex items-center justify-center uppercase">
+            {user?.name ? user.name[0] : user?.loginId ? user.loginId[0] : 'U'}
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Administrator</h2>
+            <h2 className="text-lg font-bold text-slate-900">{user?.name || 'User Profile'}</h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                MANAGER
+                {user?.role || 'STAFF'}
               </span>
-              <span className="text-xs text-slate-400 font-mono">loginId: admin</span>
+              <span className="text-xs text-slate-400 font-mono">loginId: {user?.loginId}</span>
             </div>
           </div>
         </div>
@@ -30,9 +34,9 @@ export const ProfilePage: React.FC = () => {
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
               Login ID
             </label>
-            <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-slate-700">
-              <User className="w-4 h-4 text-slate-400" />
-              <span>admin</span>
+            <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-slate-700 font-mono">
+              <UserIcon className="w-4 h-4 text-slate-400" />
+              <span>{user?.loginId}</span>
             </div>
           </div>
 
@@ -42,7 +46,7 @@ export const ProfilePage: React.FC = () => {
             </label>
             <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-slate-700">
               <Mail className="w-4 h-4 text-slate-400" />
-              <span>admin@stocksense.local</span>
+              <span>{user?.email}</span>
             </div>
           </div>
 
@@ -52,7 +56,7 @@ export const ProfilePage: React.FC = () => {
             </label>
             <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-slate-700">
               <Shield className="w-4 h-4 text-slate-400" />
-              <span>Inventory Manager</span>
+              <span>{user?.role === 'MANAGER' ? 'Inventory Manager' : 'Warehouse Staff'}</span>
             </div>
           </div>
 
@@ -63,11 +67,11 @@ export const ProfilePage: React.FC = () => {
             <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-slate-700">
               <span className="flex items-center gap-2">
                 <Key className="w-4 h-4 text-slate-400" />
-                <span>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span>
+                <span>••••••••••••</span>
               </span>
-              <button type="button" className="text-xs font-semibold text-blue-600 hover:text-blue-800">
+              <Link to="/forgot-password" className="text-xs font-semibold text-blue-600 hover:text-blue-800">
                 Change
-              </button>
+              </Link>
             </div>
           </div>
         </div>

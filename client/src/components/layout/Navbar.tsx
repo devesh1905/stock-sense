@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import {
   Boxes,
   ChevronDown,
@@ -23,10 +24,17 @@ export const Navbar: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
+  const { user, logout } = useAuth();
   const operationsRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    setProfileOpen(false);
+    await logout();
+    navigate('/login');
+  };
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -230,18 +238,22 @@ export const Navbar: React.FC = () => {
                 setOperationsOpen(false);
                 setSettingsOpen(false);
               }}
-              className="w-9 h-9 rounded-full bg-gradient-to-tr from-slate-800 to-slate-700 text-white font-semibold text-sm flex items-center justify-center hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 transition-all shadow-xs"
+              className="w-9 h-9 rounded-full bg-gradient-to-tr from-slate-800 to-slate-700 text-white font-semibold text-sm flex items-center justify-center hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 transition-all shadow-xs uppercase"
               aria-label="User profile menu"
             >
-              A
+              {user?.name ? user.name[0] : user?.loginId ? user.loginId[0] : 'A'}
             </button>
 
             {profileOpen && (
               <div className="absolute right-0 mt-2 w-52 rounded-xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-4 py-2 border-b border-slate-100">
                   <p className="text-xs text-slate-500">Signed in as</p>
-                  <p className="text-sm font-semibold text-slate-800 truncate">Administrator</p>
-                  <p className="text-xs text-slate-400 font-mono">admin (Manager)</p>
+                  <p className="text-sm font-semibold text-slate-800 truncate">
+                    {user?.name || 'User'}
+                  </p>
+                  <p className="text-xs text-slate-400 font-mono">
+                    {user?.loginId || 'user'} ({user?.role || 'STAFF'})
+                  </p>
                 </div>
                 <Link
                   to="/profile"
@@ -253,10 +265,7 @@ export const Navbar: React.FC = () => {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => {
-                    setProfileOpen(false);
-                    navigate('/login');
-                  }}
+                  onClick={handleLogout}
                   className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors text-left"
                 >
                   <LogOut className="w-4 h-4 text-rose-500" />
