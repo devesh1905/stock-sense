@@ -7,6 +7,7 @@ import categoriesRouter from './categories.js';
 import productsRouter from './products.js';
 import stockRouter from './stock.js';
 import operationsRouter from './operations.js';
+import movesRouter from './moves.js';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/categories', categoriesRouter);
 router.use('/products', productsRouter);
 router.use('/stock', stockRouter);
 router.use('/operations', operationsRouter);
+router.use('/moves', movesRouter);
 
 export default router;
