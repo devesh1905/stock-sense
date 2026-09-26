@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
+import { fetchLowStockAlerts } from '../../api/dashboard';
 import {
   Boxes,
   ChevronDown,
@@ -16,19 +18,31 @@ import {
   Bell,
   User,
   LogOut,
-  Layers
+  Layers,
+  AlertTriangle,
+  ExternalLink
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const [operationsOpen, setOperationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
 
   const { user, logout } = useAuth();
   const operationsRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+  const alertsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Low stock alerts query
+  const { data: alertsData } = useQuery({
+    queryKey: ['low-stock-alerts'],
+    queryFn: fetchLowStockAlerts,
+    refetchInterval: 30000,
+    enabled: !!user
+  });
 
   const handleLogout = async () => {
     setProfileOpen(false);
@@ -47,6 +61,9 @@ export const Navbar: React.FC = () => {
       }
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setProfileOpen(false);
+      }
+      if (alertsRef.current && !alertsRef.current.contains(e.target as Node)) {
+        setAlertsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -219,15 +236,86 @@ export const Navbar: React.FC = () => {
 
         {/* Right side: Alerts & Avatar "A" menu */}
         <div className="flex items-center gap-3">
-          {/* Low Stock Alert Button */}
-          <button
-            type="button"
-            title="Notifications & Low Stock Alerts"
-            className="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-white" />
-          </button>
+          {/* Low Stock Alert Button & Dropdown */}
+          <div className="relative" ref={alertsRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setAlertsOpen(!alertsOpen);
+                setOperationsOpen(false);
+                setSettingsOpen(false);
+                setProfileOpen(false);
+              }}
+              title="Notifications & Low Stock Alerts"
+              className="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            >
+              <Bell className="w-5 h-5" />
+              {alertsData && alertsData.count > 0 && (
+                <span className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-rose-600 text-white text-[10px] font-bold rounded-full ring-2 ring-white">
+                  {alertsData.count > 99 ? '99+' : alertsData.count}
+                </span>
+              )}
+            </button>
+
+            {alertsOpen && (
+              <div className="absolute right-0 mt-2 w-80 rounded-xl bg-white border border-slate-200 shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-500" />
+                    <span className="font-semibold text-xs text-slate-800 uppercase tracking-wider">
+                      Low Stock Alerts
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                    {alertsData?.count || 0} items
+                  </span>
+                </div>
+
+                <div className="max-h-72 overflow-y-auto divide-y divide-slate-50 px-1 py-1">
+                  {!alertsData || alertsData.count === 0 ? (
+                    <div className="py-6 text-center text-xs text-slate-400">
+                      All products are adequately stocked!
+                    </div>
+                  ) : (
+                    alertsData.alerts.map((item) => (
+                      <Link
+                        key={item.id}
+                        to="/stock"
+                        onClick={() => setAlertsOpen(false)}
+                        className="flex flex-col gap-1 p-2.5 rounded-lg hover:bg-slate-50 transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-slate-800 truncate max-w-[180px]">
+                            {item.name}
+                          </span>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 font-bold">
+                            {item.onHand} / {item.minQty} {item.uom}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span className="font-mono">{item.sku}</span>
+                          <span className="text-rose-600 font-medium">
+                            {item.onHand === 0 ? 'Out of stock' : `Short by ${item.shortage}`}
+                          </span>
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+
+                <div className="p-2 border-t border-slate-100 bg-slate-50/50">
+                  <Link
+                    to="/stock"
+                    onClick={() => setAlertsOpen(false)}
+                    className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    <span>View all products in Stock</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* User Profile Avatar "A" */}
           <div className="relative" ref={profileRef}>

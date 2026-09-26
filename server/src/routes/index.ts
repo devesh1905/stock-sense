@@ -8,6 +8,7 @@ import productsRouter from './products.js';
 import stockRouter from './stock.js';
 import operationsRouter from './operations.js';
 import movesRouter from './moves.js';
+import dashboardRouter from './dashboard.js';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/products', productsRouter);
 router.use('/stock', stockRouter);
 router.use('/operations', operationsRouter);
 router.use('/moves', movesRouter);
+router.use('/dashboard', dashboardRouter);
 
 export default router;
