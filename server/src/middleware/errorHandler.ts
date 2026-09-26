@@ -40,6 +40,15 @@ export const errorHandler: ErrorRequestHandler = (
     return;
   }
 
+  // HTTP errors (e.g. body-parser SyntaxError)
+  const httpStatus = (err as any).statusCode || (err as any).status;
+  if (httpStatus && typeof httpStatus === 'number' && httpStatus >= 400 && httpStatus < 500) {
+    res.status(httpStatus).json({
+      error: err.message || 'Bad request'
+    });
+    return;
+  }
+
   // Default Internal Error
   console.error('Unhandled server error:', err);
   res.status(500).json({

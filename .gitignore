@@ -49,4 +49,5 @@ server/prisma/*.db-journal
 # Planning, Context, and Internal Docs (Private/Sensitive)
 stocksensecontext.md
 ROADMAP.md
+UIprompt.md
 docs/
