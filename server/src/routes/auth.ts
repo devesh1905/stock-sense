@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
@@ -331,6 +331,97 @@ router.post('/reset-password', async (req: Request, res: Response) => {
     ok: true,
     message: 'Password reset successfully. You can now sign in with your new password.'
   });
+});
+
+const updateProfileSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(50),
+  email: z.string().email('Invalid email address')
+});
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z
+    .string()
+    .min(9, 'Password must be more than 8 characters')
+    .regex(/[a-z]/, 'Password must include at least one lowercase letter')
+    .regex(/[A-Z]/, 'Password must include at least one uppercase letter')
+    .regex(/[^a-zA-Z0-9]/, 'Password must include at least one special character')
+});
+
+/**
+ * PUT /api/auth/profile
+ * Updates authenticated user name and email
+ */
+router.put('/profile', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { name, email } = updateProfileSchema.parse(req.body);
+    const userId = req.user!.id;
+
+    // Check if new email is taken by another user
+    const existing = await prisma.user.findFirst({
+      where: {
+        email,
+        NOT: { id: userId }
+      }
+    });
+
+    if (existing) {
+      res.status(409).json({ error: 'Email is already in use by another account' });
+      return;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { name, email },
+      select: {
+        id: true,
+        loginId: true,
+        email: true,
+        name: true,
+        role: true
+      }
+    });
+
+    res.json({ ok: true, user: updatedUser });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/auth/change-password
+ * Changes password for authenticated user after verifying current password
+ */
+router.post('/change-password', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { currentPassword, newPassword } = changePasswordSchema.parse(req.body);
+    const userId = req.user!.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      res.status(401).json({ error: 'User not found' });
+      return;
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isValid) {
+      res.status(400).json({ error: 'Current password does not match' });
+      return;
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash }
+    });
+
+    res.json({ ok: true, message: 'Password changed successfully' });
+  } catch (error) {
+    next(error);
+  }
 });
 
 export default router;

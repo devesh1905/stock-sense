@@ -71,3 +71,13 @@ export const resetPasswordApi = async (resetToken: string, newPassword: string):
   });
   return data;
 };
+
+export const updateProfileApi = async (payload: { name: string; email: string }): Promise<User> => {
+  const { data } = await api.put<AuthResponse>('/auth/profile', payload);
+  return data.user;
+};
+
+export const changePasswordApi = async (payload: { currentPassword: string; newPassword: string }): Promise<{ ok: boolean; message: string }> => {
+  const { data } = await api.post<{ ok: boolean; message: string }>('/auth/change-password', payload);
+  return data;
+};

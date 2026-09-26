@@ -20,7 +20,9 @@ import {
   LogOut,
   Layers,
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  Menu,
+  X
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -28,6 +30,7 @@ export const Navbar: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { user, logout } = useAuth();
   const operationsRef = useRef<HTMLDivElement>(null);
@@ -91,7 +94,7 @@ export const Navbar: React.FC = () => {
                 StockSense
               </span>
               <span className="hidden sm:inline-block ml-2 text-[10px] uppercase font-semibold tracking-wider text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/60">
-                Stage 1
+                v1.0
               </span>
             </div>
           </Link>
@@ -354,7 +357,7 @@ export const Navbar: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors text-left cursor-pointer"
                 >
                   <LogOut className="w-4 h-4 text-rose-500" />
                   <span>Logout</span>
@@ -362,8 +365,122 @@ export const Navbar: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Mobile Hamburger Menu Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Collapsible Navigation Drawer */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-4 shadow-lg animate-in slide-in-from-top-2 duration-150">
+          <div className="space-y-1">
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              <LayoutDashboard className="w-4 h-4 text-blue-600" />
+              <span>Dashboard</span>
+            </Link>
+            <Link
+              to="/stock"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              <Package className="w-4 h-4 text-blue-600" />
+              <span>Products & Stock</span>
+            </Link>
+            <Link
+              to="/move-history"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              <History className="w-4 h-4 text-blue-600" />
+              <span>Move History</span>
+            </Link>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100">
+            <div className="px-3 py-1 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              Operations
+            </div>
+            <div className="space-y-1 mt-1">
+              <Link
+                to="/operations/receipts"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <ArrowDownToLine className="w-4 h-4 text-emerald-600" />
+                <span>Receipts</span>
+              </Link>
+              <Link
+                to="/operations/deliveries"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <ArrowUpFromLine className="w-4 h-4 text-blue-600" />
+                <span>Deliveries</span>
+              </Link>
+              <Link
+                to="/operations/transfers"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <ArrowLeftRight className="w-4 h-4 text-indigo-600" />
+                <span>Internal Transfers</span>
+              </Link>
+              <Link
+                to="/operations/adjustments"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <SlidersHorizontal className="w-4 h-4 text-amber-600" />
+                <span>Stock Adjustments</span>
+              </Link>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100">
+            <div className="px-3 py-1 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              Settings & Master Data
+            </div>
+            <div className="space-y-1 mt-1">
+              <Link
+                to="/settings/warehouses"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <Building2 className="w-4 h-4 text-slate-500" />
+                <span>Warehouses</span>
+              </Link>
+              <Link
+                to="/settings/locations"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <MapPin className="w-4 h-4 text-slate-500" />
+                <span>Locations</span>
+              </Link>
+              <Link
+                to="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <User className="w-4 h-4 text-slate-500" />
+                <span>My Profile</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
